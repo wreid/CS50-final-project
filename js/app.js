@@ -12,39 +12,28 @@ navigator.getUserMedia = ( navigator.getUserMedia ||
 
 function init(){
   // poly fill 
-  // navigator.mediaDevices = navigator.mediaDevices || ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
-  //    getUserMedia: function(c) {
-  //      return new Promise(function(y, n) {
-  //        (navigator.mozGetUserMedia ||
-  //         navigator.webkitGetUserMedia).call(navigator, c, y, n);
-  //      });
-  //    }
-  // } : null);
+  navigator.mediaDevices = navigator.mediaDevices || ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
+     getUserMedia: function(c) {
+       return new Promise(function(y, n) {
+         (navigator.mozGetUserMedia ||
+          navigator.webkitGetUserMedia).call(navigator, c, y, n);
+       });
+     }
+  } : null);
 
-  // if (!navigator.mediaDevices) {
-  //   console.log("getUserMedia() not supported.");
-  //   return;
-  // }
+  if (!navigator.mediaDevices) {
+    console.log("getUserMedia() not supported.");
+    return;
+  }
 
-  // navigator.mediaDevices.getUserMedia({ audio: true })
-  // .then(function(stream) {
-  //   source = context.createMediaStreamSource(stream);
-  //   source.connect(context.destination);
-  // })
-  // .catch(function(e) {
-  //   console.log(e.name);
-  // });
-
-  var constraints = { audio: true };
-
-  navigator.getUserMedia(constraints, 
-    function(stream) {
-      source = context.createMediaStreamSource(stream);
-      source.connect(context.destination);
-    },
-    function(e){
-      console.log(e.name);
-    });
+  navigator.mediaDevices.getUserMedia({ audio: true })
+  .then(function(stream) {
+    source = context.createMediaStreamSource(stream);
+    source.connect(context.destination);
+  })
+  .catch(function(e) {
+    console.log(e.name);
+  });
 
 }
 
