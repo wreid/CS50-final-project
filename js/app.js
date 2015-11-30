@@ -2,14 +2,6 @@
 // create a global context
 context = new (window.AudioContext || window.webkitAudioContext)();
 
-navigator = window.navigator;
-
-navigator.getUserMedia = ( navigator.getUserMedia || 
-  navigator.webkitGetUserMedia ||
-  navigator.mozGetUserMedia || 
-  navigator.msGetUserMedia);
-
-
 function init(){
   // poly fill 
   navigator.mediaDevices = navigator.mediaDevices || ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
@@ -26,26 +18,40 @@ function init(){
     return;
   }
 
-  navigator.mediaDevices.getUserMedia({ audio: true })
+  var constraints = { audio: true};
+
+  navigator.mediaDevices.getUserMedia(constraints)
   .then(function(stream) {
-    source = context.createMediaStreamSource(stream);
-    source.connect(context.destination);
+    source = stream;
+    }
+    
   })
-  .catch(function(e) {
+  .catch(function(e) { //error checking
     console.log(e.name);
   });
 
+  
+
 }
+function startRecording(stream){
+  // create new recorder
+  mediaRecorder = new MediaStreamRecorder(stream);
+  mediaRecorder.mimeType = 'audio/ogg';
+  mediaRecorder.audioChannels = 2;
+  mediaRecorder.ondataavailable = function (blob){  
+}
+
 
 function createOscillator(context) {
-    osc = context.createOscillator()
-    osc.frequency.value = 440           // set the frequency to 440 HZ
-    osc.connect(context.destination)    // set the output to speakers
-    osc.start(0)                        // start immediately
-    setTimeout(function() { osc.stop() }, 2000) // stop the oscillator 2 seconds from now
-    // osc.start(0) <--- this will cause an error! you need to create a new oscillator
+  osc = context.createOscillator()
+  osc.frequency.value = 440           // set the frequency to 440 HZ
+  osc.connect(context.destination)    // set the output to speakers
+  osc.start(0)                        // start immediately
+  setTimeout(function() { osc.stop() }, 2000) // stop the oscillator 2 seconds from now
+  // osc.start(0) <--- this will cause an error! you need to create a new oscillator
 }
 
+// run intitialization on DOM load
 window.onload = function(){
   console.log("finished loading");
   init(context);
