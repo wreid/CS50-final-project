@@ -1,7 +1,16 @@
 
 // Create a global context
-context = new AudioContext()
+context = new (window.AudioContext || window.webkitAudioContext)();
 
+function init(context){
+  
+  var p = navigator.mediaDevices.getUserMedia({audio: true});
+  p.then(function(stream){
+    source = context.createMediaStreamSource(stream);
+    source.connect(context.destination);
+  })
+
+}
 
 function createOscillator(context) {
     osc = context.createOscillator()
@@ -12,26 +21,7 @@ function createOscillator(context) {
     // osc.start(0) <--- this will cause an error! you need to create a new oscillator
 }
 
-
-function playFile(context) {
-    bufferLoader = new BufferLoader(
-        context,
-        [
-          '../sounds/any_song_you_want.mp3',
-          '../sounds/another_song.wav'
-        ],
-        finishedLoading
-    );
-
-  bufferLoader.load();
-}
-
-Base.prototype.play = function(time, buffer) {
-    var source = globalContext.createBufferSource();
-    var gain = globalContext.createGain();
-    source.buffer = (buffer !== undefined) ? buffer : this.buffer;
-    gain.gain.value = this.gain;
-    source.connect(gain);
-    gain.connect(globalContext.destination);
-    source.start(time);
+window.onload = function(){
+  console.log("finished loading");
+  init(context);
 }
