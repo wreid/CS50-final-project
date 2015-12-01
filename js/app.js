@@ -83,5 +83,3 @@ window.onload = function(){
     console.log("finished loading");
     init(context);
 }
-
-Test
