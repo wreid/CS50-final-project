@@ -51,7 +51,7 @@ function init(){
 
 }
 
-function startRecording(input){
+function startRecrding(input){
     // create new recorder
     recorders[recorderIndex] = new Recorder(input);
     recorders[recorderIndex].record();
