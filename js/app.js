@@ -18,19 +18,20 @@ function init(){
     return;
   }
 
-  var constraints = { audio: true};
+  var constraints = { audio: true };
 
   navigator.mediaDevices.getUserMedia(constraints)
   .then(function(stream) {
     source = stream;
-    }
-    
   })
   .catch(function(e) { //error checking
     console.log(e.name);
   });
 
-  
+  document.querySelector('#start-recording').onclick = function() {  
+      startRecording(source);
+  };
+
 
 }
 function startRecording(stream){
@@ -38,7 +39,9 @@ function startRecording(stream){
   mediaRecorder = new MediaStreamRecorder(stream);
   mediaRecorder.mimeType = 'audio/ogg';
   mediaRecorder.audioChannels = 2;
-  mediaRecorder.ondataavailable = function (blob){  
+  mediaRecorder.ondataavailable = function (blob){
+    console.log("here!");
+  }
 }
 
 
