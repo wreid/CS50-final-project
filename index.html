@@ -5,16 +5,20 @@
         <!-- style sheets -->
         <link rel="stylesheet" type="text/css" href="css/styles.css">
 
-        <!-- from https://github.com/mattdiamond/Recorderjs -->
-        <script src="libs/recorder.js"> </script>
-        <script src="libs/recorderWorker.js"></script>
-
         <!-- app -->
         <script src="js/app.js"></script>
     </head>
     <body>
-        <div>
-            <button id="start-recording"></button>
+        <div class="sound-bank">
+            <ul>
+                <li><button id="kick">Kick</button></li>
+                <li><button id="snare">Snare</button></li>
+                <li><button id="hi-hat">Hi-Hat</button></li>
+            </ul>
+        </div>
+        <div class="transport">
+            <button class="play" title="play"></button>
+            <button class="stop" title="stop"></button>
         </div>
         <!-- TODO -->
         <!-- Mute button -->
