@@ -22,7 +22,7 @@ button {
     cursor: pointer;
     width: 5em;
     height: 5em;
-    margin: 0;
+    margin: 2;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;

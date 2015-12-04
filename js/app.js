@@ -62,14 +62,22 @@ function loadSounds(kit) {
         // all directories have "." and ".." by default
         if (data.length > 2)
         {
+
+            // html template
+            var template = _.template("<li><button id='<%- name %>'><%- name %></button></li>");
+
             // for readability
             var str;
             for (var i = 0, j = data.length; i + 2 < j; i++) {
 
+                // skip over "." and ".." directories
                 str = data[i + 2];
 
                 // slice up until the file type
                 soundNames[i] = str.substring(0, str.indexOf("."));
+
+                // add button to DOM
+                $("#buttons").prepend(template({ name: soundNames[i]}));
 
                 // add formatted path to pathList
                 pathList[i] = parameters.path + "/" + str;
@@ -96,6 +104,13 @@ function finishedLoading(bufferList) {
     // load buffers into associative array with sound names
     for (var i = 0, j = bufferList.length; i < j; i++) {
         Object.defineProperty(buffers, soundNames[i], { value: bufferList[i] });
+    }
+
+    for (var i = 0, j = soundNames.length; i < j; i++) {
+        console.log("#" + soundNames[i]);
+        $("#" + soundNames[i]).on("click", soundNames[i], function(eventObject, name) {
+            playSound(name);
+        });
     }
 }
 
@@ -132,7 +147,8 @@ function toggleRecording() {
     }
 }
 
-function playSound(buffer) {
+function playSound(name) {
+    buffer = buffers[name];
     var source = context.createBufferSource(); // creates a sound source
     source.buffer = buffer;                    // tell the source which sound to play
     source.connect(context.destination);       // connect the source to the context's destination (the speakers)
