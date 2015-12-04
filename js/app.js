@@ -1,6 +1,8 @@
 // create a global context
 var context;
 var kitNames = Array();
+var buffers = {};
+var soundNames = Array();
 
 try {
   context = new (window.AudioContext || window.webkitAudioContext)();  
@@ -44,7 +46,10 @@ function getKitNames(callback) {
 }
 
 function loadSounds(kit) {
-    var path_list = Array();
+
+    var pathList = Array();
+
+    // parameters for JSON call
     var parameters = {
         path: ASSET_PATH + kit
     };
@@ -57,12 +62,18 @@ function loadSounds(kit) {
         // all directories have "." and ".." by default
         if (data.length > 2)
         {
+            // for readability
+            var str;
             for (var i = 0, j = data.length; i + 2 < j; i++) {
-            path_list[i] = parameters.path + "/" + data[i + 2];
-            console.log(path_list[i]);
-            }
 
-            console.log("path_list: " + path_list);
+                str = data[i + 2];
+
+                // slice up until the file type
+                soundNames[i] = str.substring(0, str.indexOf("."));
+
+                // add formatted path to pathList
+                pathList[i] = parameters.path + "/" + str;
+            }
         }
         else
         {
@@ -70,7 +81,7 @@ function loadSounds(kit) {
         }
 
         // load sounds into buffer
-        bufferLoader = new BufferLoader(context, path_list, finishedLoading);
+        bufferLoader = new BufferLoader(context, pathList, finishedLoading);
         bufferLoader.load();
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
@@ -81,7 +92,11 @@ function loadSounds(kit) {
 }
 
 function finishedLoading(bufferList) {
-    // TODO: load buffer list into a series of buffer nodes
+
+    // load buffers into associative array with sound names
+    for (var i = 0, j = bufferList.length; i < j; i++) {
+        Object.defineProperty(buffers, soundNames[i], { value: bufferList[i] });
+    }
 }
 
 function startLoop() {
