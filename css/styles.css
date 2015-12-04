@@ -1,14 +1,10 @@
 button {
-  background: transparent;
-  border: 0;
-  margin: 0;
-  padding: 0;
-  cursor: pointer;
+    border: 0;
+    padding: 0;
 }
 
 .sound-bank
 {
-    width: 20em;
     height: 5em;
 
     position: absolute;
@@ -22,8 +18,11 @@ button {
 }
 .sound-bank button
 {
+    background: transparent;
+    cursor: pointer;
     width: 5em;
     height: 5em;
+    margin: 0;
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
@@ -34,6 +33,7 @@ button {
 
 .sound-bank ul
 {
+    width: 100%;
     list-style: none;
     float: center;
     margin: 0px;
@@ -55,27 +55,55 @@ button {
 .transport {
   margin-top: 30px;
 }
+
 .transport button {
-  float: left;
+    float: left;
+    margin: 5px;
+    width: 40px;
+    height: 40px;
+    font-size: 40px;
+    background-color: transparent;
 }
-.transport button.play {
-  width: 50px;
-  height: 50px;
-  font-size: 50px;
+
+/* record button */
+.transport #record {
+    /*content: "\25B6";*/
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    border-radius: 20px;
+    background-color: black;
 }
-.transport button.play:after {
-  content: "\25B6";
+
+/* play button */
+.transport #play {
+    width: 0;
+    height: 0;
+    border-top: 20px solid transparent;
+    border-left: 40px solid black;
+    border-bottom: 20px solid transparent;
 }
-.transport button.play:hover {
-  color: #555555;
+    
+.transport #stop {
+    background-color: black;
 }
-.transport button.stop {
-  width: 40px;
-  height: 40px;
-  margin: 8px;
-  background-color: black;
+
+/* hover */
+.transport #stop:hover {
+    background-color: #555555;
 }
-.transport button.stop:hover {
-  background-color: #555555;
+.transport #record:hover {
+    background-color: #555555;
+}
+.transport #play:hover {
+    border-left: 40px solid #555555;    
+}
+
+.transport {
+   position:fixed;
+   left: 0px;
+   bottom:0px;
+   height:50px;
+   width:100%;
+   background:#999;
 }
 
