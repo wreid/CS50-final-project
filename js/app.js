@@ -1,7 +1,7 @@
 // create a global context
 var context;
 var kitNames = Array();
-var buffers = {};
+var buffers = Array();
 var soundNames = Array();
 
 try {
@@ -21,10 +21,14 @@ window.onload = function init() {
 
     getKitNames(loadSounds);
 
+    $(document).bind('load_complete', initListeners);
+
 }
 
 function initListeners() {
-
+    for (var i = 0, j = soundNames.length; i < j; i++) {
+        $("#" + soundNames[i]).on("click", { name: soundNames[i] }, triggerPlay );
+    }
 }
 
 function getKitNames(callback) {
@@ -91,6 +95,7 @@ function loadSounds(kit) {
         // load sounds into buffer
         bufferLoader = new BufferLoader(context, pathList, finishedLoading);
         bufferLoader.load();
+        
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
 
@@ -100,18 +105,14 @@ function loadSounds(kit) {
 }
 
 function finishedLoading(bufferList) {
-
     // load buffers into associative array with sound names
+    console.log(bufferList);
+
     for (var i = 0, j = bufferList.length; i < j; i++) {
-        Object.defineProperty(buffers, soundNames[i], { value: bufferList[i] });
+        buffers[soundNames[i]] = bufferList[i];
     }
 
-    for (var i = 0, j = soundNames.length; i < j; i++) {
-        console.log("#" + soundNames[i]);
-        $("#" + soundNames[i]).on("click", soundNames[i], function(eventObject, name) {
-            playSound(name);
-        });
-    }
+    $(document).trigger('load_complete');
 }
 
 function startLoop() {
@@ -147,10 +148,16 @@ function toggleRecording() {
     }
 }
 
-function playSound(name) {
-    buffer = buffers[name];
+// triggers sound when event listener activated
+function triggerPlay(event) {
+    playSound(event.data.name, 0);
+}
+
+// plays sound in time seconds
+function playSound(name, time) {
+    var buffer = buffers[name];
     var source = context.createBufferSource(); // creates a sound source
     source.buffer = buffer;                    // tell the source which sound to play
     source.connect(context.destination);       // connect the source to the context's destination (the speakers)
-    source.start(0);                           // play the source now
+    source.start(time);                           // play the source now
 }
