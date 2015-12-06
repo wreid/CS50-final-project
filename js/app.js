@@ -3,6 +3,8 @@ var context;
 var kitNames = Array();
 var buffers = Array();
 var soundNames = Array();
+var keys = "ASDFGHJKL";
+var NOW = 0;
 
 try {
   context = new (window.AudioContext || window.webkitAudioContext)();  
@@ -20,15 +22,16 @@ var ASSET_PATH = "sounds/"
 window.onload = function init() {
 
     getKitNames(loadSounds);
-
     $(document).bind('load_complete', initListeners);
 
 }
 
 function initListeners() {
+
     for (var i = 0, j = soundNames.length; i < j; i++) {
-        $("#" + soundNames[i]).on("click", { name: soundNames[i] }, triggerPlay );
+        $("#" + soundNames[i]).on("click", { name: soundNames[i], buttonPress: true }, triggerPlay );
     }
+    $(window).on("keydown", { keyPress: true }, triggerPlay );
 }
 
 function getKitNames(callback) {
@@ -68,7 +71,7 @@ function loadSounds(kit) {
         {
 
             // html template
-            var template = _.template("<li><button id='<%- name %>'><%- name %></button></li>");
+            var template = _.template("<li><button id='<%- name %>'><%- name %> (<%- key%>)</button></li>");
 
             // for readability
             var str;
@@ -81,7 +84,7 @@ function loadSounds(kit) {
                 soundNames[i] = str.substring(0, str.indexOf("."));
 
                 // add button to DOM
-                $("#buttons").prepend(template({ name: soundNames[i]}));
+                $("#buttons").append(template({ name: soundNames[i], key: keys[i] }));
 
                 // add formatted path to pathList
                 pathList[i] = parameters.path + "/" + str;
@@ -105,9 +108,8 @@ function loadSounds(kit) {
 }
 
 function finishedLoading(bufferList) {
-    // load buffers into associative array with sound names
-    console.log(bufferList);
 
+    // load buffers into associative array with sound names
     for (var i = 0, j = bufferList.length; i < j; i++) {
         buffers[soundNames[i]] = bufferList[i];
     }
@@ -116,6 +118,7 @@ function finishedLoading(bufferList) {
 }
 
 function startLoop() {
+
     if (!loopExists)
     {
 
@@ -127,6 +130,7 @@ function startLoop() {
 }
 
 function stopLoop() {
+
     if (!loopExists)
     {
         return;
@@ -138,6 +142,7 @@ function stopLoop() {
 }
 
 function toggleRecording() {
+
     if (recordToggle) 
     {
         recordToggle = false;
@@ -150,11 +155,30 @@ function toggleRecording() {
 
 // triggers sound when event listener activated
 function triggerPlay(event) {
-    playSound(event.data.name, 0);
+
+    if (event.data.keyPress)
+    {
+        var c = String.fromCharCode(event.keyCode);
+        var i = keys.indexOf(c);
+        if (soundNames[i])
+        {
+            playSound(soundNames[i], NOW);    
+        }
+    }
+    else if (event.data.buttonPress)
+    {
+        playSound(event.data.name, NOW);
+    }
+    else
+    {
+        console.log("Key not set");
+    }
+    
 }
 
 // plays sound in time seconds
 function playSound(name, time) {
+
     var buffer = buffers[name];
     var source = context.createBufferSource(); // creates a sound source
     source.buffer = buffer;                    // tell the source which sound to play
