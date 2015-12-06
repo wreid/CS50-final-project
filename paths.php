@@ -10,8 +10,13 @@
     $dir = $_GET["path"];
     $files = scandir($dir);
 
+    $paths = [];
+    for ($i = 0, $j = count($files); $i < $j; $i++)
+    {
+        array_push($paths, $dir . "/" . $files[$i]); //. $file);
+    }
 
     // output paths as JSON
     header("Content-type: application/json");
-    print(json_encode($files, JSON_PRETTY_PRINT));
+    print(json_encode($paths, JSON_PRETTY_PRINT));
 ?>

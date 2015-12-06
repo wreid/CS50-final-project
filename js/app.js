@@ -1,11 +1,15 @@
-// create a global context
+// GLOBALS
 var context;
 var kitNames = Array();
 var buffers = Array();
 var soundNames = Array();
 var keys = "ASDFGHJKL";
 var NOW = 0;
+var loopExists = false;
+var recordToggle = false;
+var ASSET_PATH = "sounds"
 
+// ensure webAudio support
 try {
   context = new (window.AudioContext || window.webkitAudioContext)();  
 } 
@@ -13,21 +17,19 @@ catch(e) {
     console.log("Web Audio API not supported.");
 }
 
-// globals
-var loopExists = false;
-var recordToggle = false;
-var ASSET_PATH = "sounds/"
 
 // run intitialization on DOM load
 window.onload = function init() {
 
-    getKitNames(loadSounds);
+    getKitNames(getPaths);
 
     // once backend query finished and sounds loaded, create listeners
     $(document).bind('load_complete', initListeners);
 
 }
 
+
+// create listeners for sound buttons and keyboard
 function initListeners() {
 
     for (var i = 0, j = soundNames.length; i < j; i++) {
@@ -40,6 +42,8 @@ function initListeners() {
     $(window).on("keydown", { keyPress: true }, triggerPlay );
 }
 
+
+// calls a server side script to generate names of kits
 function getKitNames(callback) {
 
     $.getJSON("paths.php", { path: ASSET_PATH })
@@ -59,65 +63,59 @@ function getKitNames(callback) {
     });
 }
 
-function loadSounds(kit) {
+// calls a server side script to generate the paths of kit sounds
+function getPaths(kit) {
+
+    // use a JSON get request to return a JSON object containing an array of
+    // paths to the individual kit sounds
+    $.getJSON("paths.php", { path: kit }, loadSounds);
+}
+
+
+// loads sounds from paths supplied by JSON data
+function loadSounds(data, textStatus, jqXHR) {
 
     // paths to be queried by the BufferLoader object
     var pathList = Array();
 
-    // parameters for JSON call
-    var parameters = {
-        path: ASSET_PATH + kit
-    };
+    // all directories have "." and ".." by default
+    if (data.length > 2)
+    {
 
-    // use a JSON get request to return a JSON object containing an array of
-    // paths to the individual kit sounds
-    $.getJSON("paths.php", parameters)
-    .done(function(data, textStatus, jqXHR) {
+        // html template for sound buttons with corresponding trigger keys
+        var template = _.template("<li><button id='<%- name %>'><%- name %> (<%- key%>)</button></li>");
 
-        // all directories have "." and ".." by default
-        if (data.length > 2)
-        {
+        // for readability
+        var str;
+        for (var i = 0, j = data.length; i + 2 < j; i++) {
 
-            // html template for sound buttons with corresponding trigger keys
-            var template = _.template("<li><button id='<%- name %>'><%- name %> (<%- key%>)</button></li>");
+            // skip over "." and ".." directories
+            str = data[i + 2];
 
-            // for readability
-            var str;
-            for (var i = 0, j = data.length; i + 2 < j; i++) {
+            // slice up until the file type
+            soundNames[i] = str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf("."));
 
-                // skip over "." and ".." directories
-                str = data[i + 2];
+            // add button to DOM
+            $("#buttons").append(template({ name: soundNames[i], key: keys[i] }));
 
-                // slice up until the file type
-                soundNames[i] = str.substring(0, str.indexOf("."));
-
-                // add button to DOM
-                $("#buttons").append(template({ name: soundNames[i], key: keys[i] }));
-
-                // add formatted path to pathList
-                pathList[i] = parameters.path + "/" + str;
-            }
+            // add formatted path to pathList
+            pathList[i] = str;
         }
-        else
-        {
-            console.log("Empty" + kit + " folder.");
-        }
+    }
+    else
+    {
+        console.log("Empty" + kit + " folder.");
+    }
 
-        // load sounds into buffer; calls finishedLoading upon completion
-        bufferLoader = new BufferLoader(context, pathList, finishedLoading);
-        bufferLoader.load();
-        
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-
-        // log error to browser's console
-        console.log(errorThrown.toString());
-    });
+    // load sounds into buffer; calls finishedLoading upon completion
+    bufferLoader = new BufferLoader(context, pathList, finishedLoading);
+    bufferLoader.load();
 }
 
+
+// create associative array with sound name keys and audio buffer values
 function finishedLoading(bufferList) {
 
-    // load buffers into associative array with sound names
     for (var i = 0, j = bufferList.length; i < j; i++) {
         buffers[soundNames[i]] = bufferList[i];
     }
@@ -125,6 +123,7 @@ function finishedLoading(bufferList) {
     // trigger load complete call
     $(document).trigger('load_complete');
 }
+
 
 function startLoop() {
 
@@ -138,6 +137,7 @@ function startLoop() {
     }
 }
 
+
 function stopLoop() {
 
     if (!loopExists)
@@ -150,6 +150,7 @@ function stopLoop() {
     }
 }
 
+
 function toggleRecording() {
 
     if (recordToggle) 
@@ -161,6 +162,7 @@ function toggleRecording() {
         recordToggle = true;
     }
 }
+
 
 // triggers sound when event listener activated
 function triggerPlay(event) {
@@ -184,6 +186,7 @@ function triggerPlay(event) {
     }
     
 }
+
 
 // plays sound in time seconds
 function playSound(name, time) {
