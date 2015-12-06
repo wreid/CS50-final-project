@@ -18,6 +18,9 @@ catch(e) {
 }
 
 
+/* LOAD FUNCTIONS */
+
+
 // run intitialization on DOM load
 window.onload = function init() {
 
@@ -27,7 +30,6 @@ window.onload = function init() {
     $(document).bind('load_complete', initListeners);
 
 }
-
 
 // create listeners for sound buttons and keyboard
 function initListeners() {
@@ -41,7 +43,6 @@ function initListeners() {
     // create listener for all keyboard presses
     $(window).on("keydown", { keyPress: true }, triggerPlay );
 }
-
 
 // calls a server side script to generate names of kits
 function getKitNames(callback) {
@@ -70,7 +71,6 @@ function getPaths(kit) {
     // paths to the individual kit sounds
     $.getJSON("paths.php", { path: kit }, loadSounds);
 }
-
 
 // loads sounds from paths supplied by JSON data
 function loadSounds(data, textStatus, jqXHR) {
@@ -112,7 +112,6 @@ function loadSounds(data, textStatus, jqXHR) {
     bufferLoader.load();
 }
 
-
 // create associative array with sound name keys and audio buffer values
 function finishedLoading(bufferList) {
 
@@ -123,6 +122,9 @@ function finishedLoading(bufferList) {
     // trigger load complete call
     $(document).trigger('load_complete');
 }
+
+
+/* LOOP FUNCTIONS */
 
 
 function startLoop() {
@@ -137,7 +139,6 @@ function startLoop() {
     }
 }
 
-
 function stopLoop() {
 
     if (!loopExists)
@@ -149,7 +150,6 @@ function stopLoop() {
 
     }
 }
-
 
 function toggleRecording() {
 
@@ -164,13 +164,22 @@ function toggleRecording() {
 }
 
 
+/* TRIGGER & PLAY FUNCTIONS */
+
+
 // triggers sound when event listener activated
 function triggerPlay(event) {
 
+    // determine whether click or keypress
     if (event.data.keyPress)
     {
+        // get char of key pressed
         var c = String.fromCharCode(event.keyCode);
+
+        // get index of char
         var i = keys.indexOf(c);
+
+        // play sound corresponding with index if exists
         if (soundNames[i])
         {
             playSound(soundNames[i], NOW);    
@@ -184,9 +193,7 @@ function triggerPlay(event) {
     {
         console.log("Key not set");
     }
-    
 }
-
 
 // plays sound in time seconds
 function playSound(name, time) {
