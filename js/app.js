@@ -22,6 +22,8 @@ var ASSET_PATH = "sounds/"
 window.onload = function init() {
 
     getKitNames(loadSounds);
+
+    // once backend query finished and sounds loaded, create listeners
     $(document).bind('load_complete', initListeners);
 
 }
@@ -29,12 +31,17 @@ window.onload = function init() {
 function initListeners() {
 
     for (var i = 0, j = soundNames.length; i < j; i++) {
+
+        // create click listener for each button
         $("#" + soundNames[i]).on("click", { name: soundNames[i], buttonPress: true }, triggerPlay );
     }
+
+    // create listener for all keyboard presses
     $(window).on("keydown", { keyPress: true }, triggerPlay );
 }
 
 function getKitNames(callback) {
+
     $.getJSON("paths.php", { path: ASSET_PATH })
     .done(function(data, textStatus, jqXHR) {
 
@@ -54,6 +61,7 @@ function getKitNames(callback) {
 
 function loadSounds(kit) {
 
+    // paths to be queried by the BufferLoader object
     var pathList = Array();
 
     // parameters for JSON call
@@ -70,7 +78,7 @@ function loadSounds(kit) {
         if (data.length > 2)
         {
 
-            // html template
+            // html template for sound buttons with corresponding trigger keys
             var template = _.template("<li><button id='<%- name %>'><%- name %> (<%- key%>)</button></li>");
 
             // for readability
@@ -95,7 +103,7 @@ function loadSounds(kit) {
             console.log("Empty" + kit + " folder.");
         }
 
-        // load sounds into buffer
+        // load sounds into buffer; calls finishedLoading upon completion
         bufferLoader = new BufferLoader(context, pathList, finishedLoading);
         bufferLoader.load();
         
@@ -114,6 +122,7 @@ function finishedLoading(bufferList) {
         buffers[soundNames[i]] = bufferList[i];
     }
 
+    // trigger load complete call
     $(document).trigger('load_complete');
 }
 
