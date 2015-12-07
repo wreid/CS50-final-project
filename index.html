@@ -2,6 +2,8 @@
 
 <html>
     <head>
+
+        <title>blooper</title>
         <!-- style sheets -->
         <link rel="stylesheet" type="text/css" href="css/styles.css">
 
@@ -11,17 +13,34 @@
         <!-- http://underscorejs.org/# -->
         <script src="libs/underscore-min.js"></script>
 
+        <!-- Bootstrap -->
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
         <!-- http://www.html5rocks.com/en/tutorials/webaudio/intro/ -->
         <script src="libs/bufferLoader.js"></script>
 
         <!-- app -->
         <script src="js/app.js"></script>
+        <script src="js/load.js"></script>
+        <script src="js/play.js"></script>
 
     </head>
     <body>
+
+        <!-- Kit selection - kits added by app -->
+        <label>Kits</label>
+        <select class="form-control" id="kitSelect"></select> 
+
+        <!-- Sound buttons -->
         <div class="sound-bank">
             <ul id="buttons"></ul>
         </div>
+
+        <!-- Transport section -->
         <div class="transport">
             <button id="play" title="play"></button>
             <button id="stop" title="stop"></button>
