@@ -44,9 +44,8 @@ function getKitNames(callback) {
 
         makeKitList(kitNames);
 
-        // php function scandir returns alphabetical list of kits, starting with
-        // "." and ".." directories; load first kit by default
-        callback(kitNames[2]);
+        // load first kit by default
+        callback(kitNames[0]);
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
 
@@ -55,36 +54,69 @@ function getKitNames(callback) {
     });
 }
 
+// reloads the kit buttons with uploaded sounds
+function handleUpload(fileList) {
+
+    if (fileList.length < 1)
+    {
+        console.log("no files selected");
+    }
+    else
+    {
+
+        // check if LOCAL option already exists
+        if (!$("#local").length)
+        {
+            $(".form-control").append("<option selected id=\"local\" value=\"local\">LOCAL</option>");
+        }
+
+        clear();
+        var pathList = Array();
+        var names = Array();
+
+        for (var i = 0, j = fileList.length; i < j; i++ ) {
+
+            fileName = fileList[i].name;
+
+            names[i] = fileName.substring(0, fileName.lastIndexOf("."));
+            pathList[i] = URL.createObjectURL(fileList[i]);
+        }
+
+        createButtons(names, pathList, true);
+
+        // load sounds into buffer; calls finishedLoading upon completion
+        var bufferLoader = new BufferLoader(context, pathList, finishedLoading);
+        bufferLoader.load();
+    }
+}
+
 // add options to dropdown menu
 function makeKitList(names) {
 
     var template = _.template("<option value=\"<%- ASSET_PATH + \"/\" + name %>\"><%- name %></option");
 
-    for (var i = 0, j = names.length; i + 2 < j; i++) {
-
-            // skip over "." and ".." directories
-            var str = names[i + 2];
+    for (var i = 0, j = names.length; i < j; i++) {
 
             // slice up until the file type
-            var name = str.substring(str.lastIndexOf("/") + 1);
+            var name = names[i].substring(names[i].lastIndexOf("/") + 1);
 
             // add button to DOM
             $(".form-control").append(template({ name: name }));
     }
     $("select").on("change", function(){
+
         clear();
-        getPaths(this.value);
+        if (this.value == "local")
+        {
+            // console.log(document.getElementById("upload").files);
+            handleUpload(document.getElementById("upload").files);
+        }
+        else
+        {
+            getPaths(this.value);
+        }
+        
     })
-
-    // var defaultKit = kitNames[2].substring(str.lastIndexOf("/") + 1);
-
-    // $(".form-control #" + defaultKit).attr("selected", "selected");
-    // $(".form-control").on("change", function() {
-
-    //     // change kit
-    //     console.log(this.id);
-    //     getPaths(event.data.kit);
-    // });
 }
 
 // clears current kit
@@ -96,48 +128,60 @@ function clear() {
 
 // calls a server side script to generate the paths of kit sounds
 function getPaths(kit) {
-    console.log(kit);
+
     // use a JSON get request to return a JSON object containing an array of
     // paths to the individual kit sounds
     $.getJSON("paths.php", { path: kit }, loadSounds);
 }
 
+// create sound triggers
+function createButtons(data, pathList, user) {
+
+    // html template for sound buttons with corresponding trigger keys
+    var template = _.template("<li><button id='<%- name %>'><%- name %> (<%- key%>)</button></li>");
+
+    // for readability
+    var str;
+
+    for (var i = 0, j = data.length; i < j; i++) {
+
+        str = data[i];
+
+        if (!user) 
+        {
+
+            // slice up until the file type
+            soundNames[i] = str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf("."));
+
+            // add formatted path to pathList
+            pathList[i] = str;
+        }
+        else 
+        {
+            soundNames[i] = str;
+        }
+
+        // add button to DOM
+        $("#buttons").append(template({ name: soundNames[i], key: keys[i] }));
+
+    }
+}
 // loads sounds from paths supplied by JSON data
 function loadSounds(data, textStatus, jqXHR) {
 
     // paths to be queried by the BufferLoader object
     var pathList = Array();
 
-    // all directories have "." and ".." by default
-    if (data.length > 2)
+    // ensure some data returned
+    if (data.length > 0)
     {
-
-        // html template for sound buttons with corresponding trigger keys
-        var template = _.template("<li><button id='<%- name %>'><%- name %> (<%- key%>)</button></li>");
-
-        // for readability
-        var str;
-        for (var i = 0, j = data.length; i + 2 < j; i++) {
-
-            // skip over "." and ".." directories
-            str = data[i + 2];
-
-            // slice up until the file type
-            soundNames[i] = str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf("."));
-
-            // add button to DOM
-            $("#buttons").append(template({ name: soundNames[i], key: keys[i] }));
-
-            // add formatted path to pathList
-            pathList[i] = str;
-        }
+        createButtons(data, pathList, false);
     }
     else
     {
         console.log("Empty" + kit + " folder.");
     }
 
-    console.log(pathList);
     // load sounds into buffer; calls finishedLoading upon completion
     var bufferLoader = new BufferLoader(context, pathList, finishedLoading);
     bufferLoader.load();
@@ -146,12 +190,10 @@ function loadSounds(data, textStatus, jqXHR) {
 // create associative array with sound name keys and audio buffer values
 function finishedLoading(bufferList) {
 
-    console.log(bufferList);
-
     for (var i = 0, j = bufferList.length; i < j; i++) {
         buffers[soundNames[i]] = bufferList[i];
     }
 
-    // trigger load complete call
+    // trigger load complete call to add event listeners
     $(document).trigger('load_complete');
 }

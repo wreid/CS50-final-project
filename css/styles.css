@@ -3,6 +3,35 @@ button {
     padding: 0;
 }
 
+#upload {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+#upload + label {
+    font-size: 1.25em;
+    font-weight: 700;
+    color: white;
+    margin: 3px;
+    padding: 2px;
+
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+    background-color: lightsalmon;
+    display: inline-block;
+}
+
+#upload:focus + label,
+#upload + label:hover {
+    background-color: salmon;
+}
+
 .sound-bank
 {
     height: 5em;

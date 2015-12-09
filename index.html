@@ -35,17 +35,23 @@
         <label>Kits</label>
         <select class="form-control" id="kitSelect"></select> 
 
+        <!-- Kit upload -->
+        <input type="file" accept=".wav" id="upload" multiple onchange="handleUpload(this.files)" class="upload">
+        <label for="upload">Upload your own kits!</label>
+
+        <span>(Only supports .wav files.)</span>
+
         <!-- Sound buttons -->
         <div class="sound-bank">
             <ul id="buttons"></ul>
         </div>
 
         <!-- Transport section -->
-        <div class="transport">
+        <!-- <div class="transport">
             <button id="play" title="play"></button>
             <button id="stop" title="stop"></button>
             <button id="record" title="record"></button>
-        </div>
+        </div> -->
         <!-- TODO -->
         <!-- Mute button -->
         <!-- Audio visualizer -->

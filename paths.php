@@ -11,7 +11,7 @@
     $files = scandir($dir);
 
     $paths = [];
-    for ($i = 0, $j = count($files); $i < $j; $i++)
+    for ($i = 2, $j = count($files); $i < $j; $i++)
     {
         array_push($paths, $dir . "/" . $files[$i]); //. $file);
     }
