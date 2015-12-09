@@ -106,7 +106,7 @@ button {
     -moz-border-radius: 20px;
     -webkit-border-radius: 20px;
     border-radius: 20px;
-    background-color: black;
+    background-color: #CC3333;
 }
 
 /* play button */
@@ -131,4 +131,14 @@ button {
 }
 .transport #play:hover {
     border-left: 40px solid #555555;    
+}
+.transport #clear {
+    background: transparent;
+    color: black;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+    width: 40px;
+    height: 40px;
 }

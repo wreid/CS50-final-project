@@ -20,8 +20,16 @@ function initAudioNodes() {
     masterGainNode.connect(outputNode);
 }
 
+// create listeners for transport section
+function initTransportListeners() {
+    $("#record").on("click", toggleRecording);
+    $("#stop").on("click", stopLoop);
+    $("#play").on("click", startLoop);
+    $("#clear").on("click", deleteLoop);
+}
+
 // create listeners for sound buttons and keyboard
-function initListeners() {
+function initButtonListeners() {
 
     for (var i = 0, j = soundNames.length; i < j; i++) {
 
@@ -67,7 +75,7 @@ function handleUpload(fileList) {
         // check if LOCAL option already exists
         if (!$("#local").length)
         {
-            $(".form-control").append("<option selected id=\"local\" value=\"local\">LOCAL</option>");
+            $(".form-control").append("<option selected id=\"local\" value=\"local\">USER</option>");
         }
 
         clear();
@@ -162,7 +170,7 @@ function createButtons(data, pathList, user) {
         }
 
         // add button to DOM
-        $("#buttons").append(template({ name: soundNames[i], key: keys[i] }));
+        $("#buttons").append(template({ name: soundNames[i], key: KEYS[i] }));
 
     }
 }
